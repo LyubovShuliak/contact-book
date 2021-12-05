@@ -1,25 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { Link } from "react-router-dom";
 
-function App() {
+import { Switch, Route } from "react-router-dom";
+import NewField from "./components/new_contact/NewField.component";
+import React, { useState, useEffect, useRef } from "react";
+import ContactInformation from "./components/contact-information/contact-information";
+import addSign from "./assets/images/add-circle-outline.svg";
+import search from "./assets/images/search.svg";
+import ContactPage from "./pages/contact-page/ContactPage";
+const App = () => {
+  const contactBook = JSON.parse(localStorage.getItem("contacts"));
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="contacts">
+      <Switch>
+        <Route exact path="/" component={ContactPage} />
+        <Route exact path="/new" component={ContactInformation} />
+        <Route exact path="/contact/:id" component={ContactInformation} />
+      </Switch>
     </div>
   );
-}
+};
 
 export default App;

@@ -1,0 +1,132 @@
+.contact_fields {
+  width: 300px;
+
+  background-color: rgb(192, 224, 224);
+  margin: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  a {
+    width: 60px;
+    text-decoration: none;
+    background-color: rgb(216, 143, 143);
+    text-align: center;
+  }
+  .field {
+    box-sizing: border-box;
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    margin-top: 10px;
+    height: 50px;
+    width: 100%;
+    border: blue 2px solid;
+    &:hover > .delete {
+      color: red;
+      display: block;
+      transform: translate(-33px, 10px);
+      position: absolute;
+      background-color: transparent;
+      font-size: 30px;
+    }
+    &:hover > .must {
+      display: block;
+    }
+    .must {
+      color: red;
+      font-size: 10px;
+      transform: translate(-110px);
+      position: absolute;
+      display: none;
+    }
+    .delete {
+      color: red;
+      display: none;
+    }
+    .edit {
+      display: block;
+      margin: 10px;
+      border: 0;
+      background-color: hsla(0, 20%, 99%, 0.4);
+      width: 70%;
+    }
+    .input {
+      display: none;
+    }
+    input {
+      box-sizing: border-box;
+    }
+    ion-icon {
+      pointer-events: none;
+    }
+  }
+}
+
+input + button,
+button + button {
+  height: 40px;
+  width: 40px;
+  margin: auto 5px;
+}
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+.icon ion-icon {
+  font-size: 60px;
+  display: block;
+}
+.icon {
+  margin: auto;
+  width: min-content;
+}
+
+button + button {
+  background-color: rgba(231, 98, 125, 0.801);
+}
+
+input + button {
+  background-color: rgb(82, 201, 209);
+}
+
+.hidden {
+  display: none;
+}
+
+.add_field {
+  box-sizing: border-box;
+  align-self: flex-start;
+  display: flex;
+  // background-color: rgb(142, 230, 230);
+
+  height: min-content;
+  ion-icon {
+    font-size: 30px;
+    color: indianred;
+  }
+  p {
+    height: 30px;
+    width: 150px;
+    text-align: center;
+    font-style: italic;
+    font-weight: bolder;
+  }
+}
+
+.new_field {
+  display: none;
+}
+button + button:hover + .hidden {
+  position: absolute;
+  display: block;
+  font-size: 12px;
+  transform: translate(300px);
+  border: darkmagenta 1px solid;
+  width: 60px;
+  background-color: white;
+}
+
+.false {
+  display: block;
+}

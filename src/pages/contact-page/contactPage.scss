@@ -1,0 +1,63 @@
+.contacts {
+  width: 600px;
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 6px;
+}
+
+.add-button {
+  border: 0;
+  cursor: pointer;
+  margin: 5px;
+
+  height: 30px;
+  width: 30px;
+}
+.add-button ion-icon {
+  font-size: 30px;
+}
+
+h1 {
+  order: -1;
+}
+
+.contacts_manipulations {
+  display: flex;
+  flex-direction: row;
+  justify-items: left;
+}
+
+img {
+  height: 50px;
+}
+
+.names {
+  display: grid;
+
+  grid-template-columns: 1fr;
+  row-gap: 6px;
+  .contact {
+    width: 300px;
+    a {
+      display: block;
+      width: 300px;
+      color: black;
+      text-decoration: none;
+      font-size: 30px;
+      text-align: center;
+      background-color: rgba(204, 161, 156, 0.438);
+      padding: 0;
+    }
+    &:hover > button {
+      position: absolute;
+      display: block;
+      transform: translate(0px, -40px);
+      height: 40px;
+      width: 40px;
+      background-color: rgba(116, 153, 209, 0.534);
+    }
+    button {
+      display: none;
+    }
+  }
+}
