@@ -9,6 +9,7 @@ export const defaultForm = [
     className: "hidden",
     name: "Имя",
     value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -18,6 +19,7 @@ export const defaultForm = [
     className: "hidden",
     name: "Фамилия",
     value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -26,7 +28,8 @@ export const defaultForm = [
     change: false,
     className: "hidden",
     name: "Номер",
-    value: "+38(0**) ***-****",
+    value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -36,6 +39,7 @@ export const defaultForm = [
     className: "hidden",
     name: "e-mail",
     value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -45,6 +49,7 @@ export const defaultForm = [
     className: "hidden",
     name: "телеграм",
     value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -54,6 +59,7 @@ export const defaultForm = [
     className: "hidden",
     name: "github",
     value: "",
+    hasChanges: false,
   },
   {
     id: uuidv4(),
@@ -63,5 +69,8 @@ export const defaultForm = [
     className: "hidden",
     name: "skype",
     value: "",
+    hasChanges: false,
   },
 ];
+
+console.log("   gde fwe3w     ".trim());

@@ -1,18 +1,45 @@
 .contact_fields {
   width: 300px;
-
   background-color: rgb(192, 224, 224);
   margin: auto;
   padding: 15px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  div + input {
+    grid-column: span 2;
+  }
+  #red_border {
+    border: 3px solid red;
+    outline: none;
+  }
+  .discard {
+    width: 30px;
+    font-size: 30px;
+    display: block;
+    justify-self: end;
+    height: 30px;
+
+    &:hover::after {
+      content: "discard last change";
+      display: block;
+      width: fit-content;
+      color: black;
+      border: 0.5px solid black;
+      font-size: 13px;
+      background-color: white;
+      transform: translate(-90px, -20px);
+      position: absolute;
+    }
+  }
   a {
     width: 60px;
     text-decoration: none;
-    background-color: rgb(216, 143, 143);
+    background-color: rgba(182, 115, 115, 0.596);
     text-align: center;
+    color: black;
   }
   .field {
+    grid-column: span 2;
     box-sizing: border-box;
     display: flex;
     position: relative;
@@ -62,12 +89,6 @@
   }
 }
 
-input + button,
-button + button {
-  height: 40px;
-  width: 40px;
-  margin: auto 5px;
-}
 button {
   border: 0;
   cursor: pointer;
@@ -82,12 +103,11 @@ button {
   width: min-content;
 }
 
-button + button {
-  background-color: rgba(231, 98, 125, 0.801);
-}
-
 input + button {
   background-color: rgb(82, 201, 209);
+  height: 40px;
+  width: 40px;
+  margin: auto 5px;
 }
 
 .hidden {
@@ -98,12 +118,11 @@ input + button {
   box-sizing: border-box;
   align-self: flex-start;
   display: flex;
-  // background-color: rgb(142, 230, 230);
-
   height: min-content;
-  ion-icon {
+  button {
     font-size: 30px;
     color: indianred;
+    background-color: transparent;
   }
   p {
     height: 30px;
@@ -116,17 +135,4 @@ input + button {
 
 .new_field {
   display: none;
-}
-button + button:hover + .hidden {
-  position: absolute;
-  display: block;
-  font-size: 12px;
-  transform: translate(300px);
-  border: darkmagenta 1px solid;
-  width: 60px;
-  background-color: white;
-}
-
-.false {
-  display: block;
 }

@@ -1,16 +1,33 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
 
-const NewField = ({ setInputFields, inputFields, id }) => {
+import { useSelector, useDispatch } from "react-redux";
+import {
+  decrement,
+  increment,
+  incrementByAmount,
+  incrementAsync,
+  selectCount,
+} from "../../app/ContactsSlice";
+
+const NewField = ({ setInputFields, inputFields }) => {
   const [isSeen, setIsSeen] = useState(false);
-
+  const dispatch = useDispatch();
+  const count = useSelector(selectCount);
+  useEffect(()=>{
+    console.log(count);
+  })
   return (
     <div className="add_field">
-      <ion-icon
-        name="add-sharp"
+      <button
         onClick={(e) => {
           setIsSeen(true);
         }}
-      ></ion-icon>
+      >
+        {" "}
+        <ion-icon name="add-sharp"></ion-icon>
+      </button>
+
       <p className={isSeen ? "new_field" : ""}> Добавить поле</p>
       <input
         placeholder="Введите название поля..."
@@ -21,11 +38,14 @@ const NewField = ({ setInputFields, inputFields, id }) => {
             setInputFields([
               ...inputFields,
               {
+                id: uuidv4(),
+                lastChange: false,
                 isChanging: false,
                 change: false,
                 className: "hidden",
                 name: e.target.value,
                 value: "",
+                hasChanges: false,
               },
             ]);
 

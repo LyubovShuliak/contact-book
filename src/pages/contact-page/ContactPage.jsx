@@ -1,31 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Switch, Route } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import ContactInformation from "../../components/contact-information/contact-information";
 import "./contactPage.scss";
-const ContactPage = () => {
+
+function ContactPage() {
   const [contacts, setContacts] = useState([]);
-  const [prevValue, setPrevValue] = useState([]);
-  const inputEl = useRef(null);
+
   useEffect(() => {
     const contactBook = JSON.parse(localStorage.getItem("contacts"));
+
     if (contactBook !== null) {
       setContacts(Object.keys(contactBook));
     }
   }, [setContacts]);
-  const handleClick = () => {
-    setPrevValue([...prevValue, inputEl.current.value]);
-    console.log(prevValue);
-  };
-  const handle = (e) => {
-    console.log(e.target.value);
-  };
   return (
     <div className="contacts">
       <h1> Книга контактов</h1>
       <div className="contacts_manipulations">
         {" "}
-        <Link to="/new" state={{ from: "" }} className="add-button">
+        <Link to="/new" className="add-button">
           {" "}
           <ion-icon name="add-outline"></ion-icon>
         </Link>
@@ -79,5 +72,5 @@ const ContactPage = () => {
       </div>
     </div>
   );
-};
+}
 export default ContactPage;

@@ -1,3 +1,7 @@
 .contacts {
   margin: auto;
 }
+
+ion-icon {
+  pointer-events: none;
+}

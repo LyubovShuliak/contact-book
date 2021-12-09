@@ -1,6 +1,6 @@
-import React, { useState, useLayoutEffect, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useParams, useHistory } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+
 import { defaultForm } from "./helpers/constants";
 import "./contacts.scss";
 import NewField from "../new_contact/NewField.component";
@@ -9,81 +9,61 @@ const ContactInformation = () => {
   let history = useHistory();
   const location = useLocation();
   const { id } = useParams();
-
-  const contact = JSON.parse(localStorage.getItem("contacts"));
-
   const inputEl = useRef([]);
-  const [editContact, setEditContact] = useState(false);
-  const [prevValue, setPrevValue] = useState({});
   const [inputFields, setInputFields] = useState(defaultForm);
-
-  useLayoutEffect(() => {
+  useEffect(() => {
+    const contact = JSON.parse(localStorage.getItem("contacts"));
     if (location.pathname !== "/new") {
+    
       setInputFields(contact[id]);
     }
-  }, []);
+  }, [location, id]);
   useEffect(() => {
     const inp = document.querySelector("input.edit");
     if (inp !== null) {
       inp.focus();
     }
   }, [inputFields]);
-  const valPhone = (a) => {
-    const b =
-      a.match(/[^\d]/gim) !== null
-        ? ""
-        : a.replace(/([0-9]{3})([0-9]{3})([0-9]{4})/gm, "($1) $2-$3");
-
-    return b;
-  };
 
   const handleSubmit = (e) => {
     const contactBook = JSON.parse(localStorage.getItem("contacts")) || {};
+    const contactId = inputFields[0].value + " " + inputFields[1].value;
+    const newContact = (contacts, newFields) =>
+      JSON.stringify({
+        ...contacts,
+        [contactId.trim()]: newFields,
+      });
 
     if (inputFields[0].value) {
-      setEditContact(true);
-      const fh = inputFields.map((elem) => {
-        return { ...elem, change: false };
+      const newFields = inputFields.map((elem) => {
+        return { ...elem, change: false, hasChanges: false };
       });
-      setInputFields(fh);
+      setInputFields(newFields);
 
       if (location.pathname === "/new") {
         if (!contactBook[inputFields[0].value + " " + inputFields[1].value]) {
-          localStorage.setItem(
-            "contacts",
-            JSON.stringify({
-              ...contactBook,
-              [inputFields[0].value + " " + inputFields[1].value]: fh,
-            })
-          );
+          localStorage.setItem("contacts", newContact(contactBook, newFields));
         } else {
           alert("contact already exist");
           return;
         }
       } else {
         delete contactBook[id];
-
-        localStorage.setItem(
-          "contacts",
-          JSON.stringify({
-            ...contactBook,
-            [inputFields[0].value + " " + inputFields[1].value]: fh,
-          })
-        );
+        localStorage.setItem("contacts", newContact(contactBook));
       }
+      delete localStorage["prevValues"];
 
       for (const p of document.querySelectorAll(".edit")) {
         p.style.pointerEvents = "none";
       }
       history.push("/");
+    } else {
+      document.querySelector(".must").style.display = "block";
     }
-
     e.preventDefault();
   };
 
   const editField = (el, e) => {
-    setPrevValue({ [el.name]: el.value });
-
     setInputFields(
       inputFields.map((inp) =>
         inp.name === el.name
@@ -94,43 +74,58 @@ const ContactInformation = () => {
   };
 
   const saveValue = (el) => {
-    setInputFields(
-      inputFields.map((inm) =>
-        inm.name === el.name
-          ? {
-              ...inm,
-              className: "",
-              value:
-                el.name === "Номер"
-                  ? valPhone(inputEl.current[inm.name].value)
-                  : inputEl.current[inm.name].value,
-              change: true,
-              isChanging: false,
-              lastChange: true,
-            }
-          : { ...inm, isChanging: false, lastChange: false }
-      )
-    );
+    let confirmChange = window.confirm(`${el.name}:${el.value}`);
+    if (confirmChange) {
+      const prevValues = JSON.parse(localStorage.getItem("prevValues")) || {};
+      localStorage.setItem(
+        "prevValues",
+        JSON.stringify({ [el.name]: el.value, ...prevValues })
+      );
+      setInputFields(
+        inputFields.map((inm) =>
+          inm.name === el.name
+            ? {
+                ...inm,
+                className: "",
+                value: inputEl.current[inm.name].value,
+                change: true,
+                isChanging: false,
+                lastChange: true,
+                hasChanges: true,
+              }
+            : { ...inm, isChanging: false, lastChange: false }
+        )
+      );
+    } else {
+      inputEl.current[el.name].value = "";
+    }
   };
   const validateInputValue = (el, e) => {
     if (e.target.value !== el.value) {
       setInputFields(
-        inputFields.map((inp) =>
-          inp.name === el.name
-            ? { ...inp, isChanging: true }
-            : { ...inp, isChanging: false }
-        )
+        inputFields.map((inp) => {
+          if (inp.name === "Номер") {
+            return {
+              ...inp,
+              isChanging: e.target.value.length === 13 ? true : false,
+            };
+          }
+          return {
+            ...inp,
+            isChanging: inp.name === el.name ? true : false,
+          };
+        })
       );
     }
+
     if (el.name === "Номер") {
       const f = Array.from(Array(10).keys()).map((e) => String(e));
-          if (
+      if (
         !f.includes(e.nativeEvent.data) &&
         e.nativeEvent.data !== " " &&
         e.nativeEvent.data !== null
       ) {
         alert("only digits");
-
         inputEl.current[el.name].value = inputEl.current[el.name].value.slice(
           0,
           inputEl.current[el.name].value.length - 1
@@ -138,60 +133,105 @@ const ContactInformation = () => {
         return;
       }
       if (e.nativeEvent.data === " " || e.nativeEvent.data === null) {
-        return
+        return;
       }
-      const value = e.target.value.match(/\d/g).join("");
-      if (value.length > 2 && +e.nativeEvent.data !== NaN) {
-        inputEl.current[el.name].value = `(${value})`;
+      const newValue = e.target.value.match(/\d/g).join("");
+      console.log(+e.nativeEvent.data);
+      if (isNaN(+e.nativeEvent.data)) return;
+
+      if (newValue.length > 2) {
+        inputEl.current[el.name].value = `(${newValue})`;
       }
-      if (value.length > 5 && +e.nativeEvent.data !== NaN) {
-        inputEl.current[el.name].value = value.replace(
+      if (newValue.length > 5) {
+        inputEl.current[el.name].value = newValue.replace(
           /([0-9]{3})([0-9]{1,3})/gm,
           "($1) $2"
         );
       }
-      if (value.length > 9 && +e.nativeEvent.data !== NaN) {
-        inputEl.current[el.name].value = value.replace(
+      if (newValue.length > 9) {
+        inputEl.current[el.name].value = newValue.replace(
           /([0-9]{3})([0-9]{3})([0-9]{1,4})/gm,
           "($1) $2-$3"
         );
       }
     }
   };
+  const discardChange = (el, e) => {
+    let f = JSON.parse(localStorage.getItem("prevValues"));
+    const prevValue = f[el.name] || "";
+    setInputFields(
+      inputFields.map((inl) =>
+        inl.name === el.name
+          ? {
+              ...inl,
+              lastChange: false,
+              value: prevValue,
+              hasChanges: false,
+            }
+          : { ...inl, lastChange: false }
+      )
+    );
+    delete f[el.name];
+    localStorage.setItem("prevValues", JSON.stringify(f));
+    e.target.style.display = "none";
+    inputEl.current[el.name].value = Object.values(prevValue);
+  };
+  const discardLastChange = (e) => {
+    let prevValues = JSON.parse(localStorage.getItem("prevValues"));
+    setInputFields(
+      inputFields.map((inl) =>
+        inl.name === Object.keys(prevValues)[0]
+          ? {
+              ...inl,
+              lastChange: false,
+              value: prevValues[inl.name],
+              hasChanges: false,
+            }
+          : { ...inl, lastChange: false }
+      )
+    );
 
+    inputEl.current[Object.keys(prevValues)[0]].value =
+      prevValues[Object.keys(prevValues)[0]];
+    delete prevValues[Object.keys(prevValues)[0]];
+    if (!Object.keys(prevValues).length) e.target.style.display = "none";
+    localStorage.setItem("prevValues", JSON.stringify(prevValues));
+  };
+  const deleteField = (el, e) => {
+    setInputFields(inputFields.filter((elem) => elem.name !== el.name));
+  };
   return (
     <form className="contact_fields">
       <Link to="/">Назад</Link>
-      <div className="icon">
-        <ion-icon name="person"></ion-icon>
-      </div>
 
+      {inputFields.findIndex((elem) => elem.hasChanges) !== -1 ? (
+        <button className="discard" type="button" onClick={discardLastChange}>
+          <ion-icon name="arrow-undo"></ion-icon>
+        </button>
+      ) : null}
       {inputFields.map((el) => (
         <div className="field" key={el.id}>
           {el.name !== "Имя" && el.name !== "Номер телефона 0" ? (
             <button
               type="button"
               className={`delete`}
-              onClick={(e) => {
-                setInputFields(
-                  inputFields.filter((elem) => elem.name !== el.name)
-                );
-              }}
+              onClick={(e) => deleteField(el, e)}
             >
               <ion-icon data-id={el.name} name="close-outline"></ion-icon>
             </button>
           ) : (
             <p className="must">объязательное поле*</p>
           )}
+          <img src="../../assets/images/telegram.png" alt="" />
           <p
             className={` edit ${el.change ? "input" : ""}`}
             onClick={() => editField(el)}
-            onMouseDown={(e) => console.log(e)}
           >
             {!el.value ? el.name : el.value}
           </p>
           <input
             ref={(elem) => (inputEl.current[el.name] = elem)}
+            id={el.isChanging || el.name !== "Номер" ? "" : "red_border"}
             className={el.change ? "edit" : "input"}
             type="text"
             onChange={(e) => validateInputValue(el, e)}
@@ -203,19 +243,14 @@ const ContactInformation = () => {
               <ion-icon name="save"></ion-icon>{" "}
             </button>
           ) : null}
-
-          {el.lastChange ? (
+          {el.hasChanges ? (
             <button
-              type="button"
               onClick={(e) => {
-                setInputFields(
-                  inputFields.map((inl) =>
-                    inl.name === el.name ? { ...inl, lastChange: false } : inl
-                  )
-                );
+                discardChange(el, e);
               }}
+              type="button"
             >
-              <ion-icon name="return-up-back-outline"></ion-icon>
+              <ion-icon name="arrow-undo"></ion-icon>
             </button>
           ) : null}
 
